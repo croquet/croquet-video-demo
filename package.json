@@ -1,0 +1,35 @@
+{
+  "name": "@croquet/video",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/video.js",
+  "scripts": {
+    "start": "parcel src/*.html -p 9009",
+    "deploy": "./deploy.sh",
+    "lint": "eslint src"
+  },
+  "author": "",
+  "license": "ISC",
+  "browserslist": {
+    "production": [
+      "> 5%"
+    ],
+    "development": [
+      "last 1 Chrome version",
+      "last 1 Firefox version",
+      "last 1 Safari version",
+      "last 1 iOS major version"
+    ]
+  },
+  "dependencies": {
+    "@croquet/croquet": "^0.2.1",
+    "toastify-js": "^1.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-import-resolver-parcel": "^1.8.4",
+    "eslint-plugin-import": "^2.16.0",
+    "parcel": "git+https://github.com/bertfreudenberg/parcel-bundler.git"
+  }
+}
