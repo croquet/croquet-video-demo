@@ -1,5 +1,5 @@
 /*
-   Copyright 2019 Croquet Studios
+   Copyright 2020 Croquet Corporation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 */
 import { Model, View, Session, Data, App } from "@croquet/croquet";
 
-const KEEP_HIDDEN_TABS_ALIVE = true;
+const KEEP_HIDDEN_TABS_ALIVE = false;
 const SCRUB_THROTTLE = 1000 / 10; // min time between scrub events
 
 // handler for sharing and playing dropped-in video files
