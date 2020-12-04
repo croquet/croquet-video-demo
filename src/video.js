@@ -270,9 +270,9 @@ class SyncedVideoModel extends Model {
         this.asset = null;
         this.handles = {};
 
-        this.subscribe(this.id, 'setPlayState', this.setPlayState);
         this.subscribe(this.id, 'add-asset', this.addAsset);
         this.subscribe(this.id, 'stored-data', this.storedData);
+        this.subscribe(this.id, 'set-play-state', this.setPlayState);
     }
 
     // 'add-asset' is published with the meta data, likely before the upload finished
@@ -295,13 +295,13 @@ class SyncedVideoModel extends Model {
         }
     }
 
-    // the SyncedVideoView sends 'setPlayState' events when the user plays, pauses or scrubs the video.  the interface location of the user action responsible for this change of state is specified in actionSpec.
+    // the SyncedVideoView sends 'set-play-state' events when the user plays, pauses or scrubs the video.  the interface location of the user action responsible for this change of state is specified in actionSpec.
     setPlayState(data) {
         const { isPlaying, startOffset, pausedTime, actionSpec } = data;
         this.isPlaying = isPlaying;
         this.startOffset = startOffset;
         this.pausedTime = pausedTime;
-        this.publish(this.id, 'playStateChanged', { isPlaying, startOffset, pausedTime, actionSpec });
+        this.publish(this.id, 'play-state-changed', { isPlaying, startOffset, pausedTime, actionSpec });
     }
 }
 SyncedVideoModel.register("SyncedVideoModel");
@@ -319,8 +319,8 @@ class SyncedVideoView extends View {
         this.remoteHandIcon = document.getElementById('remotehand');
         this.container = document.getElementById('container');
 
-        this.subscribe(this.model.id, { event: 'playStateChanged', handling: 'oncePerFrame' }, this.playStateChanged);
         this.subscribe(this.model.id, { event: 'asset-changed', handling: 'oncePerFrameWhileSynced' }, this.assetChanged);
+        this.subscribe(this.model.id, { event: 'play-state-changed', handling: 'oncePerFrame' }, this.playStateChanged);
         this.subscribe(this.viewId, { event: 'synced', handling: 'immediate' }, this.handleSyncState);
 
         this.videoView = null;
@@ -505,7 +505,7 @@ class SyncedVideoView extends View {
         const contRect = this.container.getBoundingClientRect();
         const rect = videoElem.getBoundingClientRect();
         const actionSpec = { viewId: this.viewId, type: 'video', x: (evt.offsetX + contRect.left - rect.left)/rect.width, y: (evt.offsetY + contRect.top - rect.top)/rect.height };
-        this.publish(this.model.id, 'setPlayState', { isPlaying: wantsToPlay, startOffset, pausedTime, actionSpec }); // subscribed to by the shared model
+        this.publish(this.model.id, 'set-play-state', { isPlaying: wantsToPlay, startOffset, pausedTime, actionSpec }); // subscribed to by the shared model
     }
 
     handleTimebar(proportion) {
@@ -517,7 +517,7 @@ class SyncedVideoView extends View {
         const pausedTime = videoTime;
         this.playStateChanged({ isPlaying: wantsToPlay, startOffset, pausedTime });
         const actionSpec = { viewId: this.viewId, type: 'timebar', x: proportion, y: 0.5 };
-        this.publish(this.model.id, 'setPlayState', { isPlaying: wantsToPlay, startOffset, pausedTime, actionSpec }); // subscribed to by the shared model
+        this.publish(this.model.id, 'set-play-state', { isPlaying: wantsToPlay, startOffset, pausedTime, actionSpec }); // subscribed to by the shared model
     }
 
     triggerJumpCheck() { this.jumpIfNeeded = true; } // on next checkPlayStatus() that does a timing check
