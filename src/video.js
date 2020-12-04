@@ -13,8 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-import { Model, View, App, startSession } from "@croquet/croquet";
 import { theAssetManager } from "./assetManager";
+import { Model, View, Session, Data, App } from "@croquet/croquet";
 
 const KEEP_HIDDEN_TABS_ALIVE = true;
 const SCRUB_THROTTLE = 1000 / 10; // min time between scrub events
@@ -303,7 +303,7 @@ class SyncedVideoModel extends Model {
         this.publish(this.id, 'playStateChanged', { isPlaying, startOffset, pausedTime, actionSpec });
     }
 }
-SyncedVideoModel.register();
+SyncedVideoModel.register("SyncedVideoModel");
 
 
 class SyncedVideoView extends View {
@@ -614,7 +614,15 @@ async function go() {
     App.messages = true;
     App.makeWidgetDock();
 
-    startSession("video", SyncedVideoModel, SyncedVideoView, { tps: 4, step: 'auto', autoSession: true, autoSleep: !KEEP_HIDDEN_TABS_ALIVE });
+    Session.join({
+        appId: "io.croquet.examples.video_demo",
+        name: App.autoSession(),
+        password: App.autoPassword(),
+        model: SyncedVideoModel,
+        view: SyncedVideoView,
+        tps: 4,
+        autoSleep: !KEEP_HIDDEN_TABS_ALIVE
+    });
 
 }
 
