@@ -325,10 +325,11 @@ class SyncedVideoView extends View {
 
         this.videoView = null;
         this.lastStatusCheck = this.now() + 500; // make the update loop wait a bit before checking the first time
-        if (this.model.asset.handle) this.assetChanged();
+        if (this.model.asset) this.assetChanged();
     }
 
     async assetChanged() {
+        View.displayStatus(`Fetching ${this.model.asset.name}`);
         if (!this.model.asset.handle) return;
 
         this.disposeOfVideo(); // discard any loaded or loading video
