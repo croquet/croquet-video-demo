@@ -265,7 +265,7 @@ export class Video2DView {
 
 // a shared model for handling video loads and interactions
 class SyncedVideoModel extends Model {
-    init(options) {
+    init(options, persistedSession) {
         super.init(options);
         this.asset = null;
         this.handles = {};
@@ -273,6 +273,8 @@ class SyncedVideoModel extends Model {
         this.subscribe(this.id, 'add-asset', this.addAsset);
         this.subscribe(this.id, 'stored-data', this.storedData);
         this.subscribe(this.id, 'set-play-state', this.setPlayState);
+
+        if (persistedSession) this.restoreEverything(persistedSession);
     }
 
     // 'add-asset' is published with the meta data, likely before the upload finished
@@ -293,6 +295,7 @@ class SyncedVideoModel extends Model {
             this.asset.handle = handle;
             this.publish(this.id, 'asset-changed');
         }
+        this.persistSession(this.getEverything);
     }
 
     // the SyncedVideoView sends 'set-play-state' events when the user plays, pauses or scrubs the video.  the interface location of the user action responsible for this change of state is specified in actionSpec.
@@ -302,6 +305,24 @@ class SyncedVideoModel extends Model {
         this.startOffset = startOffset;
         this.pausedTime = pausedTime;
         this.publish(this.id, 'play-state-changed', { isPlaying, startOffset, pausedTime, actionSpec });
+    }
+
+    /* persistent session data */
+
+    getEverything() {
+        const { hash, type, size, name } = this.asset;
+        return {
+            asset: { hash, type, size, name },
+            handles: Object.entries(this.handles).map(([hash, handle]) => [hash, Data.toId(handle)]),
+        };
+    }
+
+    restoreEverything(persistedData) {
+        this.addAsset(persistedData.asset);
+        for (const [hash, id] of persistedData.handles) {
+            const handle = Data.fromId(id);
+            this.storedData({hash, handle});
+        }
     }
 }
 SyncedVideoModel.register("SyncedVideoModel");
