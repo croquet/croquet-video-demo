@@ -665,7 +665,7 @@ async function go() {
     App.makeWidgetDock();
 
     Session.join({
-        appId: "io.croquet.examples.video_demo",
+        appId: "com.example.video_demo",   // replace with your own appId!
         name: App.autoSession(),
         password: App.autoPassword(),
         model: SyncedVideoModel,
